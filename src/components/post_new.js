@@ -1,25 +1,44 @@
 import React, { Component } from 'react';
 import { reduxForm } from 'redux-form';
-import { bindActionCreators } from 'redux';
+import { createPost } from '../actions/index';
 
-class PostsNew extends Component{
+class PostsNew extends Component {
+    constructor(props){
+        super(props)
+
+        this.inputValidator = this.inputValidator.bind(this);
+    }
+
+    inputValidator = (field) => {
+        return `form-group ${field.touched && field.invalid ? 'has-danger' : ''}`;
+    }
+
     render(){
         const { fields: {title, categories, content }, handleSubmit } = this.props;
 
         return(
-            <form obSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(this.props.createPost)}>
                 <h3>Create a New Post</h3>
-                <div className="form-group">
+                <div className={this.inputValidator(title)}>
                     <label>Title</label>
                     <input type="text" className="form-control" {...title}/>
+                    <div className="text-help">
+                        { title.touched ? title.error : '' }
+                    </div>
                 </div>
-                <div className="form-group">
+                <div className={this.inputValidator(categories)}>
                     <label>Categories</label>
                     <input type="text" className="form-control" {...categories}/>
+                    <div className="text-help">
+                        { categories.touched ? categories.error : ''}
+                    </div>
                 </div>
-                <div className="form-group">
+                <div className={this.inputValidator(content)}>
                     <label>Content</label>
-                    <textarea className="form-control" {...content}></textarea>
+                    <textarea className="form-control" {...content}></textarea> 
+                    <div className="text-help">
+                        { content.touched ? content.error : '' }
+                    </div>
                 </div>
 
                 <button type="submit" className="btn btn-primary">Submit</button>
@@ -28,11 +47,26 @@ class PostsNew extends Component{
     }
 }
 
-function mapDispatchToProps(dispatch) {
-    return bindActionCreators({ : }, dispatch);
+function validate(values){
+    const errors = {};
+
+    if (!values.title) {
+        errors.title = 'Please Enter a title'
+    }
+
+    if (!values.categories) {
+        errors.categories = 'Please Enter a category or two!'
+    }
+
+    if (!values.content) {
+        errors.content = 'We\'re going to need some content here!'
+    }
+
+    return errors;
 }
 
 export default reduxForm({
-    form: 'PostsNewForm',
-    fields: ['title', 'categories', 'content']
-}, null, mapDispatchToProps)(PostsNew);
+  form: 'PostsNewForm',
+  fields: ['title', 'categories', 'content'],
+  validate
+}, null, { createPost })(PostsNew);
