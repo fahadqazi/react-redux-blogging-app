@@ -16,7 +16,7 @@ class PostsShow extends Component {
         this.props.deletePost(this.props.params.id)
             .then(() => {
                 this.context.router.push('/');
-            })
+            });
     }
 
     render(){
